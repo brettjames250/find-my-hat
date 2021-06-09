@@ -123,22 +123,20 @@ class Field {
 
     // CALCULATE REQUIRED HOLES
     const numCells = fieldArray.length * fieldArray[0].length;
-    const numHoles = Math.round((percentageHoles / 100) * numCells);
+    let numHoles = Math.round((percentageHoles / 100) * numCells);
 
     // ADD HOLES IN
-    for (let i = 0; i < numHoles; i++) {
-      const holeColumn = Math.floor(Math.random() * columns);
-      const holeRow = Math.floor(Math.random() * rows);
-
-      fieldArray[holeRow][holeColumn] = hole;
+    for (numHoles; numHoles > 0; numHoles--) {
+      let holeRow = 0;
+      let holeColumn = 0;
 
       // CHECK IF HOLE LOCATION IS ALREADY PATH OR HAT
-      do {
-        fieldArray[holeRow][holeColumn] = hole;
-      } while (
-        fieldArray[holeColumn][holeRow] === pathCharacter ||
-        fieldArray[holeColumn][holeRow] === hat
-      );
+      while (fieldArray[holeRow][holeColumn] != fieldCharacter) {
+        holeRow = Math.floor(Math.random() * rows);
+        holeColumn = Math.floor(Math.random() * columns);
+      }
+
+      fieldArray[holeRow][holeColumn] = hole;
     }
 
     return fieldArray;
