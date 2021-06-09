@@ -20,45 +20,44 @@ class Field {
     while (gameOverFlag != true) {
       // RETRIEVE USER MOVE
       const move = prompt("Which way?");
-      console.log(`Direction: ${move}`);
 
       switch (move) {
         case "r":
           this.column += 1;
+          console.log("RIGHT");
           break;
         case "d":
           this.row += 1;
+          console.log("DOWN");
           break;
         case "u":
           this.row -= 1;
+          console.log("UP");
           break;
         case "l":
           this.column -= 1;
+          console.log("LEFT");
           break;
         default:
+          console.log("Enter U, D, L or R.");
       }
 
       // CHECK IF OUT OF BOUNDS
-      if (
-        [this.row] < 0 ||
-        [this.row] > this.field.length - 1 ||
-        [this.column] < 0 ||
-        [this.column] > this.field.length - 1
-      ) {
+      if (this.isOutOfBounds()) {
         console.log("OUT OF BOUNDS");
         gameOverFlag = true;
         break;
       }
 
       // CHECK IF HOLE
-      if (this.field[this.row][this.column] === hole) {
+      if (this.hasFallenDownHole()) {
         console.log("GAME OVER YOU HAVE FALLEN DOWN A HOLE!");
         gameOverFlag = true;
         break;
       }
 
       // CHECK IF HAT
-      if (this.field[this.row][this.column] === hat) {
+      if (this.hasFoundHat()) {
         console.log("CONGRATULATIONS, YOU WIN!");
         gameOverFlag = true;
         break;
@@ -74,14 +73,31 @@ class Field {
     }
   }
 
+  isOutOfBounds() {
+    return (
+      this.row < 0 ||
+      this.row > this.field.length - 1 ||
+      this.column < 0 ||
+      this.column > this.field[0].length - 1
+    );
+  }
+
+  hasFoundHat() {
+    return this.field[this.row][this.column] === hat;
+  }
+
+  hasFallenDownHole() {
+    return this.field[this.row][this.column] === hole;
+  }
+
   print() {
     for (let row of this.field) {
       console.log(row.join(" "));
     }
   }
 
-  randomIndex(upperRange){
-      return Math.floor(Math.random() * upperRange);
+  randomIndex(upperRange) {
+    return Math.floor(Math.random() * upperRange);
   }
 
   static generateField(rows, columns, percentageHoles) {
@@ -100,10 +116,10 @@ class Field {
     fieldArray[0][0] = pathCharacter;
 
     // ADD HAT IN
-    const hatX = Math.floor(Math.random() * columns);
-    const hatY = Math.floor(Math.random() * rows);
+    const hatColumn = Math.floor(Math.random() * columns);
+    const hatRow = Math.floor(Math.random() * rows);
 
-    fieldArray[hatX][hatY] = hat;
+    fieldArray[hatColumn][hatRow] = hat;
 
     // CALCULATE REQUIRED HOLES
     const numCells = fieldArray.length * fieldArray[0].length;
@@ -111,24 +127,25 @@ class Field {
 
     // ADD HOLES IN
     for (let i = 0; i < numHoles; i++) {
-      const holeX = Math.floor(Math.random() * columns);
-      const holeY = Math.floor(Math.random() * rows);
+      const holeColumn = Math.floor(Math.random() * columns);
+      const holeRow = Math.floor(Math.random() * rows);
 
-      // CHECK IF RANDOM HOLE INDEX IS ALREADY PATH OR HAT
-      if (
-        fieldArray[holeX][holeY] == pathCharacter ||
-        fieldArray[holeX][holeY] == hat
-      ) {
-      }
+      fieldArray[holeRow][holeColumn] = hole;
 
-      fieldArray[holeX][holeY] = hole;
+      // CHECK IF HOLE LOCATION IS ALREADY PATH OR HAT
+      do {
+        fieldArray[holeRow][holeColumn] = hole;
+      } while (
+        fieldArray[holeColumn][holeRow] === pathCharacter ||
+        fieldArray[holeColumn][holeRow] === hat
+      );
     }
 
     return fieldArray;
   }
 }
 
-let field = Field.generateField(10, 10, 7);
+let field = Field.generateField(10, 10, 35);
 
 const myField = new Field(field);
 
